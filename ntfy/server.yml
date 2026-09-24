@@ -1,0 +1,39 @@
+# ntfy server configuration file
+
+# Listen address
+listen-http: ":80"
+
+# Attachment settings
+attachment-total-size-limit: "100M"
+attachment-file-size-limit: "5M"
+attachment-expiry-duration: "3h"
+
+# Authentication settings
+auth-default-access: "deny-all" # Require authentication for all topics
+enable-signup: false            # Disable public signups
+enable-login: true              # Enable login page
+require-login: true
+enable-reservations: true       # Allow topic reservations
+
+# Rate limiting (adjust as needed)
+visitor-subscription-limit: 30
+visitor-request-limit-burst: 60
+visitor-request-limit-replenish: "5s"
+visitor-email-limit-burst: 16
+visitor-email-limit-replenish: "1h"
+visitor-attachment-total-size-limit: "100M"
+visitor-attachment-daily-bandwidth-limit: "500M"
+
+# Message settings
+message-size-limit: "4096"
+message-delay-limit: "12h"
+
+# Web settings
+web-root: "app"    # to disable web interface use "disable"
+
+# Logging
+log-level: "INFO"
+log-format: "text"
+
+# Manager settings
+manager-interval: "1m"
