@@ -1,0 +1,110 @@
+version: "2"
+
+run:
+  tests: false
+
+linters:
+  default: none
+  enable:
+    - asciicheck
+    - bodyclose
+    - copyloopvar
+    - cyclop
+    - dogsled
+    - dupl
+    - errcheck
+    - errorlint
+    - funlen
+    - ginkgolinter
+    - gochecknoinits
+    - goconst
+    - gocritic
+    - gocyclo
+    - godox
+    - goprintffuncname
+    - gosec
+    - ineffassign
+    - lll
+    - makezero
+    - misspell
+    - mnd
+    - nakedret
+    - nestif
+    - noctx
+    - prealloc
+    - revive
+    - unconvert
+    - unparam
+    - unused
+    - varnamelen
+    - whitespace
+
+  settings:
+    cyclop:
+      max-complexity: 10
+    errorlint:
+      comparison: true
+    goconst:
+      ignore-string-values: .*?%s|%v|%w.*
+      numbers: true
+      ignore-calls: false
+    gocritic:
+      enable-all: true
+    gocyclo:
+      min-complexity: 10
+    lll:
+      line-length: 99
+    nestif:
+      min-complexity: 3
+    prealloc:
+      simple: false
+      for-loops: true
+    whitespace:
+      multi-func: true
+
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
+    paths:
+      - temp
+    rules:
+      - linters: # general accepted var name for type assertions
+          - varnamelen
+        text: "(parameter|variable) name 'ok' is too short for the scope of its usage"
+      - linters: # general accepted var name for wait group
+          - varnamelen
+        text: "(parameter|variable) name 'wg' is too short for the scope of its usage"
+      - linters: # general accepted var name for mutex
+          - varnamelen
+        text: "(parameter|variable) name 'mu' is too short for the scope of its usage"
+      - linters: # general accepted var name for identifier
+          - varnamelen
+        text: "(parameter|variable) name 'id' is too short for the scope of its usage"
+      - linters: # general accepted var name for db transaction
+          - varnamelen
+        text: "(parameter|variable) name 'tx' is too short for the scope of its usage"
+      - linters: # general accepted var name for map key
+          - varnamelen
+        text: "(parameter|variable) name 'k' is too short for the scope of its usage"
+      - linters: # general accepted var name for map value
+          - varnamelen
+        text: "(parameter|variable) name 'v' is too short for the scope of its usage"
+      - linters: # short name for the "database"
+          - varnamelen
+        text: "(parameter|variable) name 'db' is too short for the scope of its usage"
+
+issues:
+  fix: false
+
+formatters:
+  enable:
+    - gofmt
+    - goimports
+  exclusions:
+    generated: lax
+    paths:
+      - temp

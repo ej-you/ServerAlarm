@@ -1,0 +1,10 @@
+# Environments
+.env
+env/
+ENV/
+*.env
+
+# local
+bin/
+notes.txt
+temp/
