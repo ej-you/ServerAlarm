@@ -1,10 +1,16 @@
-go_exec="./api/main.go"
+go_exec="./main.go"
 
 api-dev:
-	go run $(go_exec)
+	cd ./api && go run $(go_exec)
 
 api-lint:
 	cd ./api && golangci-lint run
 
-dev:
-	docker compose -f ./docker-compose.yml up --build
+ntfy-dev:
+	docker compose -f ./dev.docker-compose.yml up -d
+
+ntfy-dev-down:
+	docker compose -f ./dev.docker-compose.yml down
+
+mysql:
+	mysql -u test_user -p server_room
