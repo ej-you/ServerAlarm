@@ -3,6 +3,7 @@ db:
   name: "server_room" # db name
   host: "127.0.0.1" # db host
   port: 3306 # db port
+  timeout: 5s # read/write timeout
 
 ntfy:
   host: "127.0.0.1" # ntfy host
