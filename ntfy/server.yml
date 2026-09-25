@@ -33,7 +33,8 @@ web-root: "app"    # to disable web interface use "disable"
 
 # Logging
 log-level: "INFO"
-log-format: "text"
+log-format: "json"
+log-file: /var/log/ntfy.log
 
 # Manager settings
 manager-interval: "1m"
