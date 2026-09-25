@@ -1,0 +1,14 @@
+db:
+  user: "test_user" # db user
+  name: "server_room" # db name
+  host: "127.0.0.1" # db host
+  port: 3306 # db port
+
+ntfy:
+  host: "127.0.0.1" # ntfy host
+  port: 8888 # ntfy port
+  theme: "server-room" # ntfy theme
+
+logging:
+  log_level: 1 # 1 - debug, 2 - info (default), 3 - warn, 4 - error, 5 - silent
+  json_format: true # use JSON format if true
