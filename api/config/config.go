@@ -4,16 +4,18 @@ package config
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/ilyakaznacheev/cleanenv"
 )
 
 const (
 	// db
-	_defDBUser = "root"        // default db user
-	_defDBName = "server_room" // default db name
-	_defDBHost = "127.0.0.1"   // default db host
-	_defDBPort = "3306"        // default db port
+	_defDBUser    = "root"          // default db user
+	_defDBName    = "server_room"   // default db name
+	_defDBHost    = "127.0.0.1"     // default db host
+	_defDBPort    = "3306"          // default db port
+	_defDBTimeout = 5 * time.Second // default db timeout
 
 	// ntfy
 	_defNtfyHost  = "127.0.0.1" // default ntfy host
@@ -33,11 +35,12 @@ type (
 	}
 
 	DB struct {
-		User     string `yaml:"user"`
-		Password string `env-required:"true" env:"DB_PASSWORD"`
-		Name     string `yaml:"name"`
-		Host     string `yaml:"host"`
-		Port     string `yaml:"port"`
+		User     string        `yaml:"user"`
+		Password string        `env-required:"true" env:"DB_PASSWORD"`
+		Name     string        `yaml:"name"`
+		Host     string        `yaml:"host"`
+		Port     string        `yaml:"port"`
+		Timeout  time.Duration `yaml:"timeout"`
 		DSN      string
 	}
 
@@ -59,10 +62,11 @@ type (
 func NewDefault() *Config {
 	return &Config{
 		DB: DB{
-			User: _defDBUser,
-			Name: _defDBName,
-			Host: _defDBHost,
-			Port: _defDBPort,
+			User:    _defDBUser,
+			Name:    _defDBName,
+			Host:    _defDBHost,
+			Port:    _defDBPort,
+			Timeout: _defDBTimeout,
 		},
 		Ntfy: Ntfy{
 			Host:  _defNtfyHost,
@@ -92,12 +96,13 @@ func New() (*Config, error) {
 
 	// collect DSN string
 	cfg.DB.DSN = fmt.Sprintf(
-		"user=%s password=%s host=%s port=%s dbname=%s",
+		"%s:%s@tcp(%s:%s)/%s?parseTime=true&charset=utf8mb4&timeout=%s",
 		cfg.DB.User,
 		cfg.DB.Password,
 		cfg.DB.Host,
 		cfg.DB.Port,
 		cfg.DB.Name,
+		cfg.DB.Timeout,
 	)
 	return cfg, nil
 }

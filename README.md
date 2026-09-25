@@ -40,10 +40,10 @@ NTFY_PASSWORD='your-password'
 ### Файл [./api/.env](./api/.env)
 
 ```dotenv
-DB_PASSWORD='test_password'
+DB_PASSWORD="test_password"
 
 # ntfy admin token
-NTFY_TOKEN='tk_pmxwhj94glo0kiwutzwa0zp8lb056'
+NTFY_TOKEN="tk_pmxwhj94glo0kiwutzwa0zp8lb056"
 ```
 
 ## Запуск и настройка
