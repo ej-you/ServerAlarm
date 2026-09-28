@@ -10,6 +10,9 @@ ntfy:
   port: 8888 # ntfy port
   theme: "server-room" # ntfy theme
 
-logging:
-  log_level: 1 # 1 - debug, 2 - info (default), 3 - warn, 4 - error, 5 - silent
-  json_format: true # use JSON format if true
+app:
+  logging:
+    log_level: 1 # 1 - debug, 2 - info (default), 3 - warn, 4 - error, 5 - silent
+    json_format: true # use JSON format if true
+  check_db_every: 5m # time between db data checks
+  temp_threshold: 35.0 # temperature threshold in degrees Celsius

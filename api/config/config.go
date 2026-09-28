@@ -22,16 +22,18 @@ const (
 	_defNtfyPort  = "80"        // default ntfy port
 	_defNtfyTheme = "server"    // default ntfy theme
 
-	// logging
-	_defLogLevel   = 2     // default log level (info)
-	_defJSONFormat = false // default log JSON-format
+	// app
+	_defLogLevel     = 2               // default log level (info)
+	_defJSONFormat   = false           // default log JSON-format
+	_defCheckDBEvery = 5 * time.Minute // default time between db data checks
+	_defTempTreshold = 40.0            // default temperature threshold in degrees Celsius
 )
 
 type (
 	Config struct {
-		DB      `yaml:"db"`
-		Ntfy    `yaml:"ntfy"`
-		Logging `yaml:"logging"`
+		DB   `yaml:"db"`
+		Ntfy `yaml:"ntfy"`
+		App  `yaml:"app"`
 	}
 
 	DB struct {
@@ -49,6 +51,12 @@ type (
 		Port  string `yaml:"port"`
 		Theme string `yaml:"theme"`
 		Token string `env-required:"true" env:"NTFY_TOKEN"`
+	}
+
+	App struct {
+		Logging      `yaml:"logging"`
+		CheckDBEvery time.Duration `yaml:"check_db_every"`
+		TempTreshold float32       `yaml:"temp_threshold"`
 	}
 
 	Logging struct {
@@ -73,9 +81,13 @@ func NewDefault() *Config {
 			Port:  _defNtfyPort,
 			Theme: _defNtfyTheme,
 		},
-		Logging: Logging{
-			LogLevel:   _defLogLevel,
-			JSONFormat: _defJSONFormat,
+		App: App{
+			Logging: Logging{
+				LogLevel:   _defLogLevel,
+				JSONFormat: _defJSONFormat,
+			},
+			CheckDBEvery: _defCheckDBEvery,
+			TempTreshold: _defTempTreshold,
 		},
 	}
 }
