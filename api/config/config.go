@@ -25,6 +25,7 @@ const (
 	// app
 	_defLogLevel     = 2               // default log level (info)
 	_defJSONFormat   = false           // default log JSON-format
+	_defLocaleName   = "UTC"           // default locale name
 	_defCheckDBEvery = 5 * time.Minute // default time between db data checks
 	_defTempTreshold = 40.0            // default temperature threshold in degrees Celsius
 )
@@ -43,7 +44,7 @@ type (
 		Host     string        `yaml:"host"`
 		Port     string        `yaml:"port"`
 		Timeout  time.Duration `yaml:"timeout"`
-		DSN      string
+		DSN      string        `yaml:"-"`
 	}
 
 	Ntfy struct {
@@ -55,8 +56,10 @@ type (
 
 	App struct {
 		Logging      `yaml:"logging"`
-		CheckDBEvery time.Duration `yaml:"check_db_every"`
-		TempTreshold float32       `yaml:"temp_threshold"`
+		LocaleName   string         `yaml:"locale"`
+		Locale       *time.Location `yaml:"-"`
+		CheckDBEvery time.Duration  `yaml:"check_db_every"`
+		TempTreshold float32        `yaml:"temp_threshold"`
 	}
 
 	Logging struct {
@@ -86,6 +89,7 @@ func NewDefault() *Config {
 				LogLevel:   _defLogLevel,
 				JSONFormat: _defJSONFormat,
 			},
+			LocaleName:   _defLocaleName,
 			CheckDBEvery: _defCheckDBEvery,
 			TempTreshold: _defTempTreshold,
 		},
@@ -105,6 +109,13 @@ func New() (*Config, error) {
 	if err := cleanenv.ReadEnv(cfg); err != nil {
 		return nil, fmt.Errorf("read env-variables: %w", err)
 	}
+
+	// parse locale name
+	locale, err := time.LoadLocation(cfg.App.LocaleName)
+	if err != nil {
+		return nil, fmt.Errorf("parse locale name: %w", err)
+	}
+	cfg.App.Locale = locale
 
 	// collect DSN string
 	cfg.DB.DSN = fmt.Sprintf(
