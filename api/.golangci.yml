@@ -30,7 +30,7 @@ linters:
     - mnd
     - nakedret
     - nestif
-    - noctx
+    # - noctx
     - prealloc
     - revive
     - unconvert

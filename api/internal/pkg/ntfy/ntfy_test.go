@@ -11,7 +11,7 @@ func TestSendMsg(t *testing.T) {
 		t.Fatal("TEST_TOKEN env var is not specified")
 	}
 
-	client, err := NewNtfyClient(WithTokenAuth(token),
+	client, err := NewClient(WithTokenAuth(token),
 		WithHTTP(),
 		WithHost("127.0.0.1"),
 		WithPort("8888"))

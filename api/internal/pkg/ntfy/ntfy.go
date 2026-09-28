@@ -16,39 +16,43 @@ type ntfySettings struct {
 	password string
 }
 
-// Option represents an option for NtfyClient initializing.
+// Option represents an option for Client initializing.
 type Option func(*ntfySettings)
 
-// NtfyClient represents a client for ntfy server.
-type NtfyClient struct {
+// Client represents a client for ntfy server.
+type Client struct {
 	addr       string
 	authHeader string
 }
 
-// NewNtfyClient returns a new instance NtfyClient.
-func NewNtfyClient(options ...Option) (*NtfyClient, error) {
+// NewClient returns a new instance Client.
+func NewClient(options ...Option) (*Client, error) {
 	settings := &ntfySettings{
 		protocol: "https",
 		host:     "ntfy.sh",
 		port:     "80",
 	}
-
 	for _, option := range options {
 		option(settings)
 	}
 
-	client := &NtfyClient{
+	client := &Client{
 		addr: fmt.Sprintf("%s://%s:%s/", settings.protocol, settings.host, settings.port),
 	}
-	if settings.token != "" {
+
+	switch {
+	case settings.token != "":
 		client.authHeader = fmt.Sprintf("Bearer %s", settings.token)
-	} else if settings.username != "" && settings.password != "" {
+
+	case settings.username != "" && settings.password != "":
 		credentials := []byte(settings.username + ":" + settings.password)
 		encoded := base64.StdEncoding.EncodeToString(credentials)
 		client.authHeader = fmt.Sprintf("Basic %s", encoded)
-	} else {
+
+	default:
 		return nil, errors.New("at least one auth method must be presented")
 	}
+
 	return client, nil
 }
 

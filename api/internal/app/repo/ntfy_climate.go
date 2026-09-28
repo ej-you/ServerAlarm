@@ -13,13 +13,13 @@ const _datetimeLayout = "02-01-2006 15:04:05"
 
 // ClimateRepoNtfy represents an ntfy repo for entity.Climate.
 type ClimateRepoNtfy struct {
-	client *ntfy.NtfyClient
+	client *ntfy.Client
 	locale *time.Location
 	theme  string
 }
 
 // NewClimateRepoNtfy returns a new instance of ClimateRepoNtfy.
-func NewClimateRepoNtfy(client *ntfy.NtfyClient,
+func NewClimateRepoNtfy(client *ntfy.Client,
 	locale *time.Location, theme string) *ClimateRepoNtfy {
 
 	return &ClimateRepoNtfy{
