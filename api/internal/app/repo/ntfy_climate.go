@@ -2,6 +2,7 @@ package repo
 
 import (
 	"fmt"
+	"log/slog"
 	"strings"
 	"time"
 
@@ -43,5 +44,10 @@ func (r *ClimateRepoNtfy) SendTempTresholdMsg(climate *entity.Climate) error {
 	textBuilder.WriteString(" | Дата: ")
 	textBuilder.WriteString(datetime)
 
-	return r.client.SendMsg(r.theme, title, priority, tags, textBuilder.String())
+	answer, err := r.client.SendMsg(r.theme, title, priority, tags, textBuilder.String())
+	if err != nil {
+		return err
+	}
+	slog.Info("send temperature treshold message", "answer", string(answer))
+	return nil
 }

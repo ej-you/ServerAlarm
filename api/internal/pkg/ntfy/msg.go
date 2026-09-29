@@ -11,17 +11,19 @@ import (
 )
 
 const (
-	_attempts     = 2               // attempts amount after first failed
+	_attempts     = 4               // attempts amount after first failed
 	_minRetryWait = 2 * time.Second // min wait time between retries
 	_timeout      = 5 * time.Second // request timeout
 )
 
 // SendMsg sends message with given params using NtfyClient connection.
-func (c *Client) SendMsg(theme, title, priority string, tags []string, text string) error {
+func (c *Client) SendMsg(theme, title, priority string,
+	tags []string, text string) ([]byte, error) {
+
 	url := c.addr + theme
 	req, err := http.NewRequest("POST", url, strings.NewReader(text))
 	if err != nil {
-		return fmt.Errorf("create request: %w", err)
+		return nil, fmt.Errorf("create request: %w", err)
 	}
 	req.Header.Set("Title", title)
 	req.Header.Set("Priority", priority)
@@ -37,27 +39,25 @@ func (c *Client) SendMsg(theme, title, priority string, tags []string, text stri
 	// wrap request for auto-retry
 	retryReq, err := retryhttp.FromRequest(req)
 	if err != nil {
-		return fmt.Errorf("wrap request for retry: %w", err)
+		return nil, fmt.Errorf("wrap request for retry: %w", err)
 	}
 	// send request
 	resp, err := client.Do(retryReq)
 	if err != nil {
-		return fmt.Errorf("do request: %w", err)
+		return nil, fmt.Errorf("do request: %w", err)
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode/100 != 2 { //nolint:mnd // check 2xx code
-		return parseError(resp)
+		return nil, parseError(resp)
 	}
 
-	// TODO: return resp???
+	// read body
 	bytesMsg, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return fmt.Errorf("parse error: read body: %w", err)
+		return nil, fmt.Errorf("read body: %w", err)
 	}
-	fmt.Println(string(bytesMsg))
-
-	return nil
+	return bytesMsg, nil
 }
 
 // parseError parses error from response.

@@ -2,6 +2,7 @@ package repo
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 
 	"server-alarm/api/internal/app/entity"
@@ -25,6 +26,9 @@ func NewClimateRepoCache(storageInst storage.KeyValue) *ClimateRepoCache {
 // Get gets last climate record from storage.
 func (r *ClimateRepoCache) Get() (*entity.Climate, error) {
 	data, err := r.storageInst.Get(_key)
+	if errors.Is(err, storage.ErrNotFound) {
+		return nil, nil
+	}
 	if err != nil {
 		return nil, fmt.Errorf("get: %w", err)
 	}

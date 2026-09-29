@@ -3,13 +3,13 @@ package db
 import (
 	"os"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 func TestConnDB(t *testing.T) {
 	dsn := os.Getenv("TEST_DSN")
-	if dsn == "" {
-		t.Fatal("TEST_DSN env var is not specified")
-	}
+	require.NotZero(t, dsn, "TEST_DSN env var is not specified")
 
 	db, err := New(dsn)
 	if err != nil {
