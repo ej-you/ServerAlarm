@@ -2,18 +2,17 @@
 package main
 
 import (
-	"fmt"
 	"log"
 
-	"server-alarm/api/config"
+	"server-alarm/api/internal/app"
 )
 
 func main() {
-	fmt.Println("SERVER ALARM")
-
-	cfg, err := config.New()
+	application, err := app.New()
 	if err != nil {
-		log.Fatalf("load config: %v", err)
+		log.Fatalf("init app: %v", err)
 	}
-	fmt.Println(cfg)
+	if err := application.Run(); err != nil {
+		log.Fatalf("run app: %v", err)
+	}
 }

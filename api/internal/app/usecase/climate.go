@@ -47,10 +47,6 @@ func (u *ClimateUC) CheckTemperature() error {
 	}
 
 	// skip cases
-	if lastNew.Temperature < u.tempTreshold {
-		sendMsgLog(lastNew, false, false)
-		return nil
-	}
 	if lastOld != nil {
 		if lastOld.Datetime.Equal(lastNew.Datetime) {
 			slog.Debug("check temperature: no new data received from db")
@@ -60,6 +56,10 @@ func (u *ClimateUC) CheckTemperature() error {
 			sendMsgLog(lastNew, true, false)
 			return nil
 		}
+	}
+	if lastNew.Temperature < u.tempTreshold {
+		sendMsgLog(lastNew, false, false)
+		return nil
 	}
 	// send message
 	sendMsgLog(lastNew, true, true)

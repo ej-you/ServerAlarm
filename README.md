@@ -92,3 +92,26 @@ NTFY_TOKEN='tk_pmxwhj94glo0kiwutzwa0zp8lb056'
 ```shell
 docker compose up --build -d api
 ```
+
+## Администрирование
+
+### Создание пользователя
+
+```shell
+docker compose exec -it ntfy ntfy user add your-username
+```
+
+> ! _Также для работы с пользователями есть другие функции._
+>
+> ! _Подсказку по ним можно получить командой_
+> \- `docker compose exec -it ntfy ntfy user --help`
+
+### Изменение конфига [./api/config.yml](./api/config.yml)
+
+Для применения изменений в этом файле при уже запущенном сервисе `api` его необходимо перезапустить.
+Для этого используйте команды:
+
+```shell
+docker compose down api
+docker compose up --build -d api
+```
