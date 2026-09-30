@@ -1,18 +1,17 @@
 package repo
 
 import (
-	"database/sql"
-
 	"server-alarm/api/internal/app/entity"
+	"server-alarm/api/internal/pkg/db"
 )
 
 // ClimateRepoDB represents a DB repo for entity.Climate.
 type ClimateRepoDB struct {
-	dbInst *sql.DB
+	dbInst *db.DB
 }
 
 // NewClimateRepoDB returns a new instance of ClimateRepoDB.
-func NewClimateRepoDB(dbInst *sql.DB) *ClimateRepoDB {
+func NewClimateRepoDB(dbInst *db.DB) *ClimateRepoDB {
 	return &ClimateRepoDB{
 		dbInst: dbInst,
 	}
