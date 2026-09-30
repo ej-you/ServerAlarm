@@ -23,11 +23,12 @@ const (
 	_defNtfyTheme = "server"    // default ntfy theme
 
 	// app
-	_defLogLevel     = 2               // default log level (info)
-	_defJSONFormat   = false           // default log JSON-format
-	_defLocaleName   = "UTC"           // default locale name
-	_defCheckDBEvery = 5 * time.Minute // default time between db data checks
-	_defTempTreshold = 40.0            // default temperature threshold in degrees Celsius
+	_defLogLevel        = 2               // default log level (info)
+	_defJSONFormat      = false           // default log JSON-format
+	_defLocaleName      = "UTC"           // default locale name
+	_defCheckDBEvery    = 5 * time.Minute // default time between db data checks
+	_defTempTreshold    = 40.0            // default temperature threshold in degrees Celsius
+	_defHealthcheckPort = "80"            // default port for healthcheck service
 )
 
 type (
@@ -60,12 +61,17 @@ type (
 		Locale       *time.Location `yaml:"-"`
 		CheckDBEvery time.Duration  `yaml:"check_db_every"`
 		TempTreshold float32        `yaml:"temp_threshold"`
+		HealthCheck  `yaml:"healthcheck"`
 	}
 
 	Logging struct {
 		LogLevel int `yaml:"log_level"`
 		// use JSON format if true
 		JSONFormat bool `yaml:"json_format"`
+	}
+
+	HealthCheck struct {
+		Port string `yaml:"port"`
 	}
 )
 
@@ -92,6 +98,9 @@ func NewDefault() *Config {
 			LocaleName:   _defLocaleName,
 			CheckDBEvery: _defCheckDBEvery,
 			TempTreshold: _defTempTreshold,
+			HealthCheck: HealthCheck{
+				Port: _defHealthcheckPort,
+			},
 		},
 	}
 }

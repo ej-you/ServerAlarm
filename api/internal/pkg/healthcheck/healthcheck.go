@@ -14,6 +14,7 @@ import (
 
 // Checking describes item for health check.
 type Checking interface {
+	// IsReady checks that item is ready to use. Returns nil error if item is ready.
 	IsReady() error
 }
 
@@ -77,7 +78,7 @@ func (h *HealthCheck) Started() <-chan struct{} {
 	return h.started
 }
 
-// Started returns chan that signals that service's exited.
+// Exited returns chan that signals that service's exited.
 func (h *HealthCheck) Exited() <-chan struct{} {
 	return h.exited
 }

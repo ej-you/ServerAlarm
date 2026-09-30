@@ -6,22 +6,33 @@ import (
 	"log/slog"
 	"os"
 	"os/signal"
+	"sync"
 	"syscall"
-	"time"
 
 	"server-alarm/api/config"
 	"server-alarm/api/internal/app/repo"
+	"server-alarm/api/internal/app/service"
 	"server-alarm/api/internal/app/usecase"
 	"server-alarm/api/internal/pkg/db"
+	"server-alarm/api/internal/pkg/healthcheck"
 	"server-alarm/api/internal/pkg/logger"
 	"server-alarm/api/internal/pkg/ntfy"
 	"server-alarm/api/internal/pkg/storage"
 )
 
-// App represents full application with a single service.
+// Service describes app service started in parallel with other similar services.
+type Service interface {
+	// Started returns chan that signals that service's readiness.
+	Started() <-chan struct{}
+	// Exited returns chan that signals that service's exited.
+	Exited() <-chan struct{}
+	// Run starts service. Waits to context done to exit.
+	Run(ctx context.Context, errChan chan<- error)
+}
+
+// App represents full application with a list of service.
 type App struct {
-	climateUC    *usecase.ClimateUC
-	checkDBEvery time.Duration
+	services []Service
 }
 
 // New returns a new instance of App.
@@ -64,11 +75,13 @@ func New() (*App, error) {
 		cfg.App.TempTreshold,
 	)
 
-	slog.Info("init app", "status", "OK")
+	healthcheckService := healthcheck.New([]healthcheck.Checking{dbInst},
+		healthcheck.WithPort(cfg.App.HealthCheck.Port))
+	climateService := service.NewClimateService(climateUC, cfg.App.CheckDBEvery)
 
+	slog.Info("init app", "status", "OK")
 	return &App{
-		climateUC:    climateUC,
-		checkDBEvery: cfg.App.CheckDBEvery,
+		[]Service{healthcheckService, climateService},
 	}, nil
 }
 
@@ -88,10 +101,22 @@ func (a *App) Run() (appErr error) {
 		syscall.SIGQUIT,
 	)
 
-	// start service
-	serviceErr := make(chan error, 1)
-	go a.runService(appContext, serviceErr)
+	// wait groups to sync starting/exiting all services
+	var wgStarted, wgExited sync.WaitGroup
 
+	// start services
+	serviceErr := make(chan error, 1)
+	for _, service := range a.services {
+		wgStarted.Go(func() {
+			<-service.Started()
+		})
+		wgExited.Go(func() {
+			<-service.Exited()
+		})
+		go service.Run(appContext, serviceErr)
+	}
+
+	wgStarted.Wait()
 	select {
 	case handledSignal := <-quitSig:
 		cancel()
@@ -99,30 +124,12 @@ func (a *App) Run() (appErr error) {
 	case err := <-serviceErr:
 		cancel()
 		appErr = fmt.Errorf("service: %w", err)
-		slog.Warn("service fell down; shutdown app...")
+		slog.Warn("one of services fell down; shutdown app...")
 	case <-appContext.Done():
 		appErr = appContext.Err()
 		slog.Warn("context canceled; shutdown app...")
 	}
+	wgExited.Wait()
+	slog.Info("all services exited")
 	return appErr
-}
-
-// runService starts app service.
-// Service checks temperature with "checkDBEvery" interval.
-func (a *App) runService(ctx context.Context, errChan chan<- error) {
-	slog.Info("start check temperature service", "status", "OK")
-	ticker := time.NewTicker(a.checkDBEvery)
-	defer ticker.Stop()
-
-	for {
-		select {
-		case <-ctx.Done():
-			return
-		case <-ticker.C:
-			//
-			if err := a.climateUC.CheckTemperature(); err != nil {
-				errChan <- err
-			}
-		}
-	}
 }

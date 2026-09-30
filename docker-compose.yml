@@ -29,8 +29,16 @@ services:
       dockerfile: ./build/Dockerfile
     container_name: server-alarm-api
     restart: always
-    #env_file:
-    #  - ./.env
+    env_file:
+     - ./.env
+    volumes:
+      - ./api/config.yml:/app/config.yml:ro
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --tries=1 http://localhost:5555/health -O - | grep -Eo 'ok' || exit 1"]
+      interval: 60s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
     networks:
       - main_network
     depends_on:

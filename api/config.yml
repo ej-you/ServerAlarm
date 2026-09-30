@@ -15,5 +15,7 @@ app:
     log_level: 1 # 1 - debug, 2 - info (default), 3 - warn, 4 - error, 5 - silent
     json_format: true # use JSON format if true
   locale: "Europe/Moscow" # local time zone name
-  check_db_every: 5m # time between db data checks
+  check_db_every: 10s # 5m # time between db data checks
   temp_threshold: 35.0 # temperature threshold in degrees Celsius
+  healthcheck:
+    port: 5555 # port for healthcheck HTTP-lightserver
