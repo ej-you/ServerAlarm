@@ -24,7 +24,10 @@ func New(dsn string) (*DB, error) {
 	}
 	db := &DB{sqlDB}
 	// check connection
-	return db, db.IsReady() // err OR nil
+	if err := db.IsReady(); err != nil {
+		return nil, err
+	}
+	return db, nil
 }
 
 // IsReady checks that DB is ready to use.

@@ -12,6 +12,12 @@ import (
 	"github.com/hashicorp/go-multierror"
 )
 
+const (
+	_readTimeout     = 5 * time.Second // server read request timeout
+	_writeTimeout    = 5 * time.Second // server write response timeout
+	_shutdownTimeout = 3 * time.Second // server gracefully shutdown timeout
+)
+
 // Checking describes item for health check.
 type Checking interface {
 	// IsReady checks that item is ready to use. Returns nil error if item is ready.
@@ -99,7 +105,12 @@ func (h *HealthCheck) Run(ctx context.Context, errChan chan<- error) {
 	// init server
 	mux := http.NewServeMux()
 	mux.HandleFunc(h.route, h.healthHanlder)
-	srv := &http.Server{Addr: addr, Handler: mux}
+	srv := &http.Server{
+		Addr:         addr,
+		Handler:      mux,
+		ReadTimeout:  _readTimeout,
+		WriteTimeout: _writeTimeout,
+	}
 
 	// serve connections
 	go func() {
@@ -112,7 +123,7 @@ func (h *HealthCheck) Run(ctx context.Context, errChan chan<- error) {
 
 	// gracefully shutdown server
 	<-ctx.Done()
-	shutdownCtx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	shutdownCtx, cancel := context.WithTimeout(context.Background(), _shutdownTimeout)
 	defer cancel()
 	if err := srv.Shutdown(shutdownCtx); err != nil {
 		slog.Warn("shutdown healthcheck server", "err", err)
@@ -121,7 +132,7 @@ func (h *HealthCheck) Run(ctx context.Context, errChan chan<- error) {
 }
 
 // healthHanlder handles HealthCheck route.
-func (h *HealthCheck) healthHanlder(w http.ResponseWriter, r *http.Request) {
+func (h *HealthCheck) healthHanlder(w http.ResponseWriter, _ *http.Request) {
 	var (
 		health = true
 		err    error
@@ -133,7 +144,7 @@ func (h *HealthCheck) healthHanlder(w http.ResponseWriter, r *http.Request) {
 			err = multierror.Append(err, itemErr)
 		}
 	}
-	// return response
+	// return error or response
 	if !health {
 		http.Error(w, err.Error(), http.StatusServiceUnavailable)
 		return

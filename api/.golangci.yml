@@ -96,6 +96,10 @@ linters:
       - linters: # short name for the "database"
           - varnamelen
         text: "(parameter|variable) name 'db' is too short for the scope of its usage"
+      - linters: # general accepted var name for http.ResponseWriter
+          - varnamelen
+        text: "(parameter|variable) name 'w' is too short for the scope of its usage"
+
 
 issues:
   fix: false
