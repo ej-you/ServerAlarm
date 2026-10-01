@@ -109,9 +109,8 @@ docker compose exec -it ntfy ntfy user add your-username
 ### Изменение конфига [./api/config.yml](./api/config.yml)
 
 Для применения изменений в этом файле при уже запущенном сервисе `api` его необходимо перезапустить.
-Для этого используйте команды:
+Для этого используйте команду:
 
 ```shell
-docker compose down api
-docker compose up --build -d api
+docker compose restart api
 ```
