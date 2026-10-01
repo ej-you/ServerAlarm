@@ -30,7 +30,7 @@ services:
     container_name: server-alarm-api
     restart: always
     env_file:
-     - ./.env
+     - ./api/.env
     volumes:
       - ./api/config.yml:/app/config.yml:ro
     healthcheck:
@@ -39,8 +39,7 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
-    networks:
-      - main_network
+    network_mode: host
     depends_on:
       - ntfy
 

@@ -5,6 +5,7 @@ package config
 import (
 	"fmt"
 	"time"
+	_ "time/tzdata" // compressed tz data to don't depend on system files
 
 	"github.com/ilyakaznacheev/cleanenv"
 )
