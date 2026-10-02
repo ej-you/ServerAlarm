@@ -50,7 +50,7 @@ func New() (*App, error) {
 	// print out config params in debug log mode
 	slog.Debug("current config", "config", cfg)
 	slog.Info("checking config",
-		"check db every", cfg.App.CheckDBEvery,
+		"check db every", cfg.App.CheckDBEvery.String(),
 		"temperature treshold", cfg.App.TempTreshold)
 
 	// init sources
