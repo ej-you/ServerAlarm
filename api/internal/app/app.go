@@ -49,6 +49,9 @@ func New() (*App, error) {
 	logger.InitSlog(logOpts...)
 	// print out config params in debug log mode
 	slog.Debug("current config", "config", cfg)
+	slog.Info("checking config",
+		"check db every", cfg.App.CheckDBEvery,
+		"temperature treshold", cfg.App.TempTreshold)
 
 	// init sources
 	storageInst := storage.NewKeyValueInMem()
