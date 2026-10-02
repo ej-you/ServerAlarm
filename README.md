@@ -62,8 +62,7 @@ docker compose up -d ntfy
 > ! _Далее для админа используется имя `root`._
 > _Если хотите изменить имя админа, то используйте другое имя везде, где указан `root`._
 >
-> ! _Пароль админа можно поменять в [.env](./ntfy/.env) файле для `ntfy`_
-> _Для этого нужно изменить значение ключа `NTFY_PASSWORD`_
+> ! _Скрипт попросит ввести пароль. Можете ввести любой_
 
 ```shell
 docker compose exec -it ntfy ntfy user add --role=admin root
@@ -98,13 +97,34 @@ docker compose up --build -d api
 ### Создание пользователя
 
 ```shell
-docker compose exec -it ntfy ntfy user add your-username
+docker compose exec -it ntfy ntfy user add {username}
 ```
 
 > ! _Также для работы с пользователями есть другие функции._
 >
 > ! _Подсказку по ним можно получить командой_
 > \- `docker compose exec -it ntfy ntfy user --help`
+
+### Выдача прав пользователю
+
+> ! _На место `username` впишите имя пользователя, которому будете выдавать права._
+>
+> ! _На место `theme` впишите название темы, по которой будете выдавать права._
+> _Активную тему для уведомлений из серверной можно найти в [файле](./api/config.yml) в разделе `ntfy`_
+
+Выдача прав только на чтение темы:
+
+```shell
+docker compose exec -it ntfy ntfy access {username} {theme} read-only
+```
+
+Другие доступные права: read-write (rw), read-only (ro), write-only (wo), deny (none).
+
+### Просмотр прав пользователей
+
+```shell
+docker compose exec -it ntfy ntfy access
+```
 
 ### Изменение конфига [./api/config.yml](./api/config.yml)
 
