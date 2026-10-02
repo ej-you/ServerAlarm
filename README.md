@@ -32,9 +32,6 @@ NTFY_ATTACHMENT_CACHE_DIR='/var/lib/ntfy/attachments'
 # is reverse-proxy in use
 NTFY_BEHIND_PROXY=true
 NTFY_AUTH_DEFAULT_ACCESS='deny-all'
-
-# admin password
-NTFY_PASSWORD='your-password'
 ```
 
 ### Файл [./api/.env](./api/.env)
