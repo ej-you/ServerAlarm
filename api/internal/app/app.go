@@ -51,7 +51,7 @@ func New() (*App, error) {
 	slog.Debug("current config", "config", cfg)
 	slog.Info("checking config",
 		"check db every", cfg.App.CheckDBEvery.String(),
-		"temperature treshold", cfg.App.TempTreshold)
+		"temperature tresholds", cfg.App.TempThreshold)
 
 	// init sources
 	storageInst := storage.NewKeyValueInMem()
@@ -75,7 +75,9 @@ func New() (*App, error) {
 		climateRepoCache,
 		climateRepoDB,
 		climateRepoNtfy,
-		cfg.App.Climate.TempTreshold.Standart,
+		cfg.App.Climate.TempThreshold.Standart,
+		cfg.App.Climate.TempThreshold.High,
+		cfg.App.Climate.TempThreshold.Urgent,
 	)
 
 	healthcheckService := healthcheck.New([]healthcheck.Checking{dbInst},

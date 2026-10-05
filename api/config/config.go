@@ -32,10 +32,10 @@ const (
 	_defHealthcheckPort = "80" // default port for healthcheck service
 
 	// climate
-	_defCheckDBEvery         = 5 * time.Minute // default time between db data checks
-	_defTempTresholdStandart = 35.0            // default standart temperature threshold
-	_defTempTresholdHigh     = 40.0            // default high temperature threshold
-	_defTempTresholdUrgent   = 45.0            // default urgent temperature threshold
+	_defCheckDBEvery          = 5 * time.Minute // default time between db data checks
+	_defTempThresholdStandart = 35.0            // default standart temperature threshold
+	_defTempThresholdHigh     = 40.0            // default high temperature threshold
+	_defTempThresholdUrgent   = 45.0            // default urgent temperature threshold
 )
 
 type (
@@ -81,11 +81,11 @@ type (
 	}
 
 	Climate struct {
-		CheckDBEvery time.Duration `yaml:"check_db_every"`
-		TempTreshold `yaml:"temp_threshold"`
+		CheckDBEvery  time.Duration `yaml:"check_db_every"`
+		TempThreshold `yaml:"temp_threshold"`
 	}
 
-	TempTreshold struct {
+	TempThreshold struct {
 		Standart float32 `yaml:"standart"`
 		High     float32 `yaml:"high"`
 		Urgent   float32 `yaml:"urgent"`
@@ -118,10 +118,10 @@ func NewDefault() *Config {
 			},
 			Climate: Climate{
 				CheckDBEvery: _defCheckDBEvery,
-				TempTreshold: TempTreshold{
-					Standart: _defTempTresholdStandart,
-					High:     _defTempTresholdHigh,
-					Urgent:   _defTempTresholdUrgent,
+				TempThreshold: TempThreshold{
+					Standart: _defTempThresholdStandart,
+					High:     _defTempThresholdHigh,
+					Urgent:   _defTempThresholdUrgent,
 				},
 			},
 		},

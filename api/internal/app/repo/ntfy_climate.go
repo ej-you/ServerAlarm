@@ -1,7 +1,6 @@
 package repo
 
 import (
-	"fmt"
 	"log/slog"
 	"strings"
 	"time"
@@ -31,16 +30,15 @@ func NewClimateRepoNtfy(client *ntfy.Client,
 }
 
 // SendTempTresholdMsg sends message about critical temperature value.
-func (r *ClimateRepoNtfy) SendTempTresholdMsg(climate *entity.Climate) error {
+func (r *ClimateRepoNtfy) SendTempTresholdMsg(climate *entity.Climate, priority string) error {
 	title := "Критическая температура"
-	priority := "high"
 	tags := []string{"warning"}
 	datetime := climate.Datetime.In(r.locale).Format(_datetimeLayout)
 
 	var textBuilder strings.Builder
 	textBuilder.WriteString("ВНИМАНИЕ! Температура в серверной достигла критической отметки.\n")
 	textBuilder.WriteString("Значение: ")
-	fmt.Fprintf(&textBuilder, "%.1f°C", climate.Temperature)
+	textBuilder.WriteString(climate.TemperatureString())
 	textBuilder.WriteString(" | Дата: ")
 	textBuilder.WriteString(datetime)
 

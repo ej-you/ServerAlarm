@@ -6,6 +6,7 @@ import (
 
 	"server-alarm/api/internal/app/entity"
 	"server-alarm/api/internal/app/repo"
+	"server-alarm/api/internal/pkg/utils/threshold"
 )
 
 // ClimateUC represents a usecases for entity.Climate.
@@ -13,18 +14,21 @@ type ClimateUC struct {
 	climateRepoCache *repo.ClimateRepoCache
 	climateRepoDB    *repo.ClimateRepoDB
 	climateRepoNtfy  *repo.ClimateRepoNtfy
-	tempTreshold     float32
+	tempThreshold    *threshold.Threshold[float32]
 }
 
 // NewClimateUC returns a new instance of ClimateUC.
-func NewClimateUC(climateRepoCache *repo.ClimateRepoCache, climateRepoDB *repo.ClimateRepoDB,
-	climateRepoNtfy *repo.ClimateRepoNtfy, tempTreshold float32) *ClimateUC {
+func NewClimateUC(climateRepoCache *repo.ClimateRepoCache,
+	climateRepoDB *repo.ClimateRepoDB, climateRepoNtfy *repo.ClimateRepoNtfy,
+	tempThresholdStandart, tempThresholdHigh, tempThresholdUrgent float32) *ClimateUC {
 
 	return &ClimateUC{
 		climateRepoCache: climateRepoCache,
 		climateRepoDB:    climateRepoDB,
 		climateRepoNtfy:  climateRepoNtfy,
-		tempTreshold:     tempTreshold,
+		tempThreshold: threshold.New(
+			tempThresholdStandart, tempThresholdHigh, tempThresholdUrgent,
+		),
 	}
 }
 
@@ -46,34 +50,54 @@ func (u *ClimateUC) CheckTemperature() error {
 		slog.Warn("check temperature: set last record to cache", "err", err)
 	}
 
-	// skip cases
-	if lastOld != nil {
-		if lastOld.Datetime.Equal(lastNew.Datetime) {
-			slog.Debug("check temperature: no new data received from db")
-			return nil
-		}
-		if lastOld.Temperature >= u.tempTreshold && lastNew.Temperature >= u.tempTreshold {
-			sendMsgLog(lastNew, true, false)
-			return nil
-		}
-	}
-	if lastNew.Temperature < u.tempTreshold {
-		sendMsgLog(lastNew, false, false)
+	lvl := u.tempThreshold.Level(lastNew.Temperature)
+	lvlString := threshold.LevelString(lvl)
+	// skip
+	if u.skipCases(lastOld, lastNew, lvl) {
 		return nil
 	}
 	// send message
-	sendMsgLog(lastNew, true, true)
-	if err := u.climateRepoNtfy.SendTempTresholdMsg(lastNew); err != nil {
+	sendMsgLog(lastNew, lvl, true)
+	if err = u.climateRepoNtfy.SendTempTresholdMsg(lastNew, lvlString); err != nil {
 		return fmt.Errorf("send ntfy message: %w", err)
 	}
 	return nil
 }
 
+// skipCases returns true on any skip case.
+func (u *ClimateUC) skipCases(lastOld, lastNew *entity.Climate, lvl int) bool {
+	// no new data (skip if level is not Urgent)
+	if lvl != threshold.Urgent && lastOld != nil && lastOld.Datetime.Equal(lastNew.Datetime) {
+		slog.Debug("check temperature: no new data received from db")
+		return true
+	}
+	// skip if threshold was not exceeded
+	if lvl == threshold.Zero {
+		sendMsgLog(lastNew, threshold.Zero, false)
+		return true
+	}
+
+	if lastOld == nil {
+		return false
+	}
+	// skip if last old level is not Zero
+	if lvl == threshold.Standart && u.tempThreshold.Level(lastOld.Temperature) != threshold.Zero {
+		sendMsgLog(lastNew, threshold.Standart, false)
+		return true
+	}
+	// skip if last old level is not Standart
+	if lvl == threshold.High && u.tempThreshold.Level(lastOld.Temperature) != threshold.Standart {
+		sendMsgLog(lastNew, threshold.High, false)
+		return true
+	}
+	return false
+}
+
 // sendMsgLog create info log about tempreture checking.
-func sendMsgLog(climate *entity.Climate, tresholdExceeded, sendMsg bool) {
+func sendMsgLog(climate *entity.Climate, thresholdLevel int, sendMsg bool) {
 	slog.Info("check temperature",
-		"temperature", climate.Temperature,
+		"temperature", climate.TemperatureString(),
 		"datetime", climate.Datetime,
-		"treshold exceeded", tresholdExceeded,
+		"threshold exceeded", threshold.LevelString(thresholdLevel),
 		"send message", sendMsg)
 }

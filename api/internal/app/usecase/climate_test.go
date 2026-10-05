@@ -23,7 +23,11 @@ func TestCheckTemperature(t *testing.T) {
 
 	location := time.FixedZone("UTC+3", 3*60*60)
 	theme := "test"
-	var treshold float32 = 33.0
+	var (
+		tresholdStandart float32 = 33.0
+		tresholdHigh     float32 = 33.0
+		tresholdUrgent   float32 = 33.0
+	)
 
 	storageInst := storage.NewKeyValueInMem()
 	climateRepoCache := repo.NewClimateRepoCache(storageInst)
@@ -39,7 +43,8 @@ func TestCheckTemperature(t *testing.T) {
 	require.NoError(t, err, "create ntfy client")
 	climateRepoNtfy := repo.NewClimateRepoNtfy(ntfyClient, location, theme)
 
-	_testUC = NewClimateUC(climateRepoCache, climateRepoDB, climateRepoNtfy, treshold)
+	_testUC = NewClimateUC(climateRepoCache, climateRepoDB, climateRepoNtfy,
+		tresholdStandart, tresholdHigh, tresholdUrgent)
 
 	err = _testUC.CheckTemperature()
 	require.NoError(t, err, "check temperature")
