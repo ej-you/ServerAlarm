@@ -24,12 +24,18 @@ const (
 	_defNtfyTheme = "server"    // default ntfy theme
 
 	// app
-	_defLogLevel        = 2               // default log level (info)
-	_defJSONFormat      = false           // default log JSON-format
-	_defLocaleName      = "UTC"           // default locale name
-	_defCheckDBEvery    = 5 * time.Minute // default time between db data checks
-	_defTempTreshold    = 40.0            // default temperature threshold in degrees Celsius
-	_defHealthcheckPort = "80"            // default port for healthcheck service
+	_defLocaleName = "UTC" // default locale name
+	_defLogLevel   = 2     // default log level (info)
+	_defJSONFormat = false // default log JSON-format
+
+	// healthcheck
+	_defHealthcheckPort = "80" // default port for healthcheck service
+
+	// climate
+	_defCheckDBEvery         = 5 * time.Minute // default time between db data checks
+	_defTempTresholdStandart = 35.0            // default standart temperature threshold
+	_defTempTresholdHigh     = 40.0            // default high temperature threshold
+	_defTempTresholdUrgent   = 45.0            // default urgent temperature threshold
 )
 
 type (
@@ -57,12 +63,11 @@ type (
 	}
 
 	App struct {
-		Logging      `yaml:"logging"`
-		LocaleName   string         `yaml:"locale"`
-		Locale       *time.Location `yaml:"-"`
-		CheckDBEvery time.Duration  `yaml:"check_db_every"`
-		TempTreshold float32        `yaml:"temp_threshold"`
-		HealthCheck  `yaml:"healthcheck"`
+		LocaleName  string         `yaml:"locale"`
+		Locale      *time.Location `yaml:"-"`
+		Logging     `yaml:"logging"`
+		HealthCheck `yaml:"healthcheck"`
+		Climate     `yaml:"climate"`
 	}
 
 	Logging struct {
@@ -73,6 +78,17 @@ type (
 
 	HealthCheck struct {
 		Port string `yaml:"port"`
+	}
+
+	Climate struct {
+		CheckDBEvery time.Duration `yaml:"check_db_every"`
+		TempTreshold `yaml:"temp_threshold"`
+	}
+
+	TempTreshold struct {
+		Standart float32 `yaml:"standart"`
+		High     float32 `yaml:"high"`
+		Urgent   float32 `yaml:"urgent"`
 	}
 )
 
@@ -92,15 +108,21 @@ func NewDefault() *Config {
 			Theme: _defNtfyTheme,
 		},
 		App: App{
+			LocaleName: _defLocaleName,
 			Logging: Logging{
 				LogLevel:   _defLogLevel,
 				JSONFormat: _defJSONFormat,
 			},
-			LocaleName:   _defLocaleName,
-			CheckDBEvery: _defCheckDBEvery,
-			TempTreshold: _defTempTreshold,
 			HealthCheck: HealthCheck{
 				Port: _defHealthcheckPort,
+			},
+			Climate: Climate{
+				CheckDBEvery: _defCheckDBEvery,
+				TempTreshold: TempTreshold{
+					Standart: _defTempTresholdStandart,
+					High:     _defTempTresholdHigh,
+					Urgent:   _defTempTresholdUrgent,
+				},
 			},
 		},
 	}

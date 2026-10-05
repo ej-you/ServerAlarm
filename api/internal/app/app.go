@@ -75,7 +75,7 @@ func New() (*App, error) {
 		climateRepoCache,
 		climateRepoDB,
 		climateRepoNtfy,
-		cfg.App.TempTreshold,
+		cfg.App.Climate.TempTreshold.Standart,
 	)
 
 	healthcheckService := healthcheck.New([]healthcheck.Checking{dbInst},
