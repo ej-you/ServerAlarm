@@ -100,7 +100,6 @@ linters:
           - varnamelen
         text: "(parameter|variable) name 'w' is too short for the scope of its usage"
 
-
 issues:
   fix: false
 
