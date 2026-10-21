@@ -36,6 +36,9 @@ const (
 	_defTempThresholdStandart = 35.0            // default standart temperature threshold
 	_defTempThresholdHigh     = 40.0            // default high temperature threshold
 	_defTempThresholdUrgent   = 45.0            // default urgent temperature threshold
+
+	// ntfy check
+	_defNtfyCheckPeriod = 24 * time.Hour // default time between sending check messages
 )
 
 type (
@@ -64,10 +67,11 @@ type (
 
 	App struct {
 		LocaleName  string         `yaml:"locale"`
-		Locale      *time.Location `yaml:"-"`
+		Locale      *time.Location `yaml:"-" json:"-"`
 		Logging     `yaml:"logging"`
 		HealthCheck `yaml:"healthcheck"`
 		Climate     `yaml:"climate"`
+		NtfyCheck   `yaml:"ntfy_check"`
 	}
 
 	Logging struct {
@@ -89,6 +93,10 @@ type (
 		Standart float32 `yaml:"standart"`
 		High     float32 `yaml:"high"`
 		Urgent   float32 `yaml:"urgent"`
+	}
+
+	NtfyCheck struct {
+		Period time.Duration `yaml:"period"`
 	}
 )
 
@@ -123,6 +131,9 @@ func NewDefault() *Config {
 					High:     _defTempThresholdHigh,
 					Urgent:   _defTempThresholdUrgent,
 				},
+			},
+			NtfyCheck: NtfyCheck{
+				Period: _defNtfyCheckPeriod,
 			},
 		},
 	}

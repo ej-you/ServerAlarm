@@ -23,3 +23,5 @@ app:
       standart: 35.0
       high: 40.0
       urgent: 45.0
+  ntfy_check:
+    period: 30s # time between sending check messages

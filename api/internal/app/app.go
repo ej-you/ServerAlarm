@@ -70,6 +70,7 @@ func New() (*App, error) {
 	climateRepoDB := repo.NewClimateRepoDB(dbInst)
 	climateRepoCache := repo.NewClimateRepoCache(storageInst)
 	climateRepoNtfy := repo.NewClimateRepoNtfy(ntfyClient, cfg.App.Locale, cfg.Ntfy.Theme)
+	ntfyRepoNtfy := repo.NewAnyMsgRepoNtfy(ntfyClient, cfg.Ntfy.Theme)
 	// init usecases
 	climateUC := usecase.NewClimateUC(
 		climateRepoCache,
@@ -79,14 +80,16 @@ func New() (*App, error) {
 		cfg.App.Climate.TempThreshold.High,
 		cfg.App.Climate.TempThreshold.Urgent,
 	)
+	ntfyCheckUC := usecase.NewNtfyCheckUC(ntfyRepoNtfy)
 
 	healthcheckService := healthcheck.New([]healthcheck.Checking{dbInst},
 		healthcheck.WithPort(cfg.App.HealthCheck.Port))
-	climateService := service.NewClimateService(climateUC, cfg.App.CheckDBEvery)
+	climateService := service.NewClimateService(climateUC, cfg.App.Climate.CheckDBEvery)
+	ntfyCheckService := service.NewNtfyCheckService(ntfyCheckUC, cfg.App.NtfyCheck.Period)
 
 	slog.Info("init app", "status", "OK")
 	return &App{
-		[]Service{healthcheckService, climateService},
+		[]Service{healthcheckService, climateService, ntfyCheckService},
 	}, nil
 }
 
