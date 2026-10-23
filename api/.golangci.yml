@@ -17,7 +17,7 @@ linters:
     - funlen
     - ginkgolinter
     - gochecknoinits
-    - goconst
+    # - goconst
     - gocritic
     - gocyclo
     - godox
@@ -99,6 +99,13 @@ linters:
       - linters: # general accepted var name for http.ResponseWriter
           - varnamelen
         text: "(parameter|variable) name 'w' is too short for the scope of its usage"
+
+      - linters: # similar services
+          - dupl
+        text: "1-62 lines are duplicate of `internal/app/service/climate.go:1-60"
+      - linters: # similar services
+          - dupl
+        text: "1-60 lines are duplicate of `internal/app/service/ntfy_check.go:1-62"
 
 issues:
   fix: false

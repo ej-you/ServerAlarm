@@ -30,7 +30,7 @@ func TestCheckTemperature(t *testing.T) {
 	)
 
 	storageInst := storage.NewKeyValueInMem()
-	climateRepoCache := repo.NewClimateRepoCache(storageInst)
+	climateRepoCache := repo.NewClimateRepoCache(storageInst, 3)
 
 	dbInst, err := db.New(dsn)
 	require.NoError(t, err, "create db instance")

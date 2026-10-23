@@ -68,7 +68,7 @@ func New() (*App, error) {
 	}
 	// init repos
 	climateRepoDB := repo.NewClimateRepoDB(dbInst)
-	climateRepoCache := repo.NewClimateRepoCache(storageInst)
+	climateRepoCache := repo.NewClimateRepoCache(storageInst, cfg.App.Climate.History)
 	climateRepoNtfy := repo.NewClimateRepoNtfy(ntfyClient, cfg.App.Locale, cfg.Ntfy.Theme)
 	ntfyRepoNtfy := repo.NewAnyMsgRepoNtfy(ntfyClient, cfg.Ntfy.Theme)
 	// init usecases
