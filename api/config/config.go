@@ -32,6 +32,7 @@ const (
 	_defHealthcheckPort = "80" // default port for healthcheck service
 
 	// climate
+	_defHistory               = 3               // default max count of climate objects
 	_defCheckDBEvery          = 5 * time.Minute // default time between db data checks
 	_defTempThresholdStandart = 35.0            // default standart temperature threshold
 	_defTempThresholdHigh     = 40.0            // default high temperature threshold
@@ -85,6 +86,7 @@ type (
 	}
 
 	Climate struct {
+		History       int           `yaml:"history"`
 		CheckDBEvery  time.Duration `yaml:"check_db_every"`
 		TempThreshold `yaml:"temp_threshold"`
 	}
@@ -125,6 +127,7 @@ func NewDefault() *Config {
 				Port: _defHealthcheckPort,
 			},
 			Climate: Climate{
+				History:      _defHistory,
 				CheckDBEvery: _defCheckDBEvery,
 				TempThreshold: TempThreshold{
 					Standart: _defTempThresholdStandart,

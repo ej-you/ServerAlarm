@@ -18,6 +18,7 @@ app:
   healthcheck:
     port: 5555 # port for healthcheck HTTP-lightserver
   climate:
+    history: 10 # max count of climate objects to check sensor failure
     check_db_every: 1m # 5m # time between db data checks
     temp_threshold: # temperature thresholds in degrees Celsius
       standart: 35.0
